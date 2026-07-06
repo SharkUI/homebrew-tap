@@ -1,6 +1,6 @@
 # SharkUI Homebrew Tap
 
-Homebrew tap for [SharkBay](https://sharkbay.xyz).
+Homebrew tap for [SharkBay](https://sharkbay.xyz/).
 
 ## Install
 
@@ -8,10 +8,14 @@ Homebrew tap for [SharkBay](https://sharkbay.xyz).
 brew install --cask SharkUI/tap/sharkbay
 ```
 
-Or:
+Installing by this fully-qualified name trusts only the SharkBay cask, so it
+works directly on Homebrew 6.0+ (which requires trust for third-party taps).
+
+Short-name form (Homebrew 6.0+ needs an explicit trust step first):
 
 ```bash
 brew tap SharkUI/tap
+brew trust --cask SharkUI/tap/sharkbay
 brew install --cask sharkbay
 ```
 

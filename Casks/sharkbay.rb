@@ -6,7 +6,7 @@ cask "sharkbay" do
       verified: "github.com/SharkUI/SharkBay/"
   name "SharkBay"
   desc "macOS workbench for multi-agent vibe coding"
-  homepage "https://sharkbay.xyz"
+  homepage "https://sharkbay.xyz/"
 
   livecheck do
     url :url
@@ -14,6 +14,7 @@ cask "sharkbay" do
   end
 
   depends_on arch: :arm64
+  depends_on macos: ">= :big_sur"
 
   app "SharkBay.app"
 
