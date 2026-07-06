@@ -5,7 +5,7 @@ cask "sharkbay" do
   url "https://github.com/SharkUI/SharkBay/releases/download/v#{version}/SharkBay-#{version}-arm64.dmg",
       verified: "github.com/SharkUI/SharkBay/"
   name "SharkBay"
-  desc "macOS workbench for multi-agent vibe coding"
+  desc "Workbench for multi-agent vibe coding"
   homepage "https://sharkbay.xyz/"
 
   livecheck do
@@ -14,7 +14,7 @@ cask "sharkbay" do
   end
 
   depends_on arch: :arm64
-  depends_on macos: ">= :big_sur"
+  depends_on macos: :big_sur
 
   app "SharkBay.app"
 
