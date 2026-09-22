@@ -25,6 +25,10 @@ brew install --cask sharkbay
 brew upgrade --cask sharkbay
 ```
 
+The tap checks the latest stable SharkBay GitHub Release every hour and updates
+the cask version and SHA-256 automatically. The workflow can also be run
+manually from GitHub Actions.
+
 ## Notes
 
 - macOS on Apple Silicon (arm64).

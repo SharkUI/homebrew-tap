@@ -1,0 +1,80 @@
+name: Update SharkBay cask
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-sharkbay-cask
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update from the latest stable release
+        id: update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          release_json="$(gh api repos/SharkUI/SharkBay/releases/latest)"
+          tag_name="$(jq -r '.tag_name' <<<"$release_json")"
+          version="${tag_name#v}"
+
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Unexpected release tag: $tag_name" >&2
+            exit 1
+          fi
+
+          asset_name="SharkBay-${version}-arm64.dmg"
+          digest="$(jq -r --arg name "$asset_name" '.assets[] | select(.name == $name) | .digest // empty' <<<"$release_json")"
+
+          if [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            sha256="${digest#sha256:}"
+          else
+            artifact="$(mktemp)"
+            trap 'rm -f "$artifact"' EXIT
+            gh release download "$tag_name" --repo SharkUI/SharkBay --pattern "$asset_name" --output "$artifact"
+            sha256="$(shasum -a 256 "$artifact" | awk '{print $1}')"
+          fi
+
+          ruby - "$version" "$sha256" <<'RUBY'
+          path = "Casks/sharkbay.rb"
+          content = File.read(path)
+          abort "Version stanza not found" unless content.sub!(/^  version "[^"]+"$/, "  version \"#{ARGV[0]}\"")
+          abort "SHA-256 stanza not found" unless content.sub!(/^  sha256 "[0-9a-f]{64}"$/, "  sha256 \"#{ARGV[1]}\"")
+          File.write(path, content)
+          RUBY
+
+          if git diff --quiet -- Casks/sharkbay.rb; then
+            echo "changed=false" >>"$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >>"$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate cask
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          brew tap SharkUI/tap
+          tap_root="$(brew --repo SharkUI/tap)"
+          cp Casks/sharkbay.rb "$tap_root/Casks/sharkbay.rb"
+          brew style SharkUI/tap
+          brew audit --cask --online SharkUI/tap/sharkbay
+
+      - name: Commit update
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          version="$(ruby -ne 'puts $1 if $_ =~ /^  version "([^"]+)"$/' Casks/sharkbay.rb)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Casks/sharkbay.rb
+          git commit -m "Update SharkBay cask to v${version}"
+          git push
