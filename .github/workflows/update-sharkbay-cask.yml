@@ -63,6 +63,9 @@ jobs:
 
       - name: Validate cask
         if: steps.update.outputs.changed == 'true'
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+          HOMEBREW_NO_AUTO_UPDATE: 1
         run: |
           brew tap SharkUI/tap
           tap_root="$(brew --repo SharkUI/tap)"
