@@ -59,6 +59,7 @@ jobs:
           else
             echo "changed=true" >>"$GITHUB_OUTPUT"
           fi
+          echo "version=$version" >>"$GITHUB_OUTPUT"
 
       - name: Validate cask
         if: steps.update.outputs.changed == 'true'
@@ -71,10 +72,11 @@ jobs:
 
       - name: Commit update
         if: steps.update.outputs.changed == 'true'
+        env:
+          VERSION: ${{ steps.update.outputs.version }}
         run: |
-          version="$(ruby -ne 'puts $1 if $_ =~ /^  version "([^"]+)"$/' Casks/sharkbay.rb)"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Casks/sharkbay.rb
-          git commit -m "Update SharkBay cask to v${version}"
+          git commit -m "Update SharkBay cask to v${VERSION}"
           git push
