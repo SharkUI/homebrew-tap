@@ -70,6 +70,7 @@ jobs:
           brew tap SharkUI/tap
           tap_root="$(brew --repo SharkUI/tap)"
           cp Casks/sharkbay.rb "$tap_root/Casks/sharkbay.rb"
+          brew trust --cask SharkUI/tap/sharkbay
           brew style SharkUI/tap
           brew audit --cask --online SharkUI/tap/sharkbay
 
