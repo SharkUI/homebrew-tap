@@ -1,6 +1,6 @@
 cask "sharkbay" do
-  version "0.3.10"
-  sha256 "6b54eb17aed654b4cd63729209f97cc4ef8b2b01d88f9db2680fa79b12cb493f"
+  version "0.3.11"
+  sha256 "440192a058e4458edf84d8d9c3e470ebb54ae465fb9f9349caef4ed62a579d5e"
 
   url "https://github.com/SharkUI/SharkBay/releases/download/v#{version}/SharkBay-#{version}-arm64.dmg"
   name "SharkBay"
